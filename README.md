@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/markdown-hierarchy-splitter.svg)](https://badge.fury.io/py/markdown-hierarchy-splitter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-一个为RAG系统设计的Markdown文档工具，提供1标题结构格式化和2文档分割功能。完整保留文档层级结构，解决传统切分器丢失标题层级与破坏表格完整性的问题。
+一个为RAG系统设计的Markdown文档工具，提供标题结构自动抽取和文档分割两大功能。完整保留文档层级结构，解决传统切分器丢失标题层级与破坏表格完整性的问题。
 
 ## 🌟 主要特性
 
