@@ -1,1 +1,3 @@
-from processor import MarkdownProcessorLocal
+from .processor import MarkdownProcessorLocal
+
+__all__ = ['MarkdownProcessorLocal']

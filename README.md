@@ -50,6 +50,11 @@ source venv/bin/activate  # Linux/Mac
 ```bash
 pip install -e .
 ```
+4. 如果安装遇到问题，您也可以尝试使用较低版本的setuptools：
+```bash
+bashCopypip install setuptools==58.2.0
+pip install -e .
+```
 
 ## 示例
 ```markdown
@@ -111,40 +116,22 @@ g) 注水泥前，钻井液性能应保持稳定；降低钻井液屈服值，�
 ### 基本用法
 ```python
 from markdown_hierarchy_splitter import MarkdownProcessorLocal
+from pathlib import Path
 
-# 初始化处理器
-processor = MarkdownProcessorLocal(chunk_size=300)
+# 创建处理器实例，可以指定自定义的输出目录
+processor = MarkdownProcessorLocal(
+    chunk_size=300,
+    default_output_dir="./my_output"  # 可选
+)
 
-# 处理Markdown文件
-with open('data/input/example.md', 'r', encoding='utf-8') as f:
-    markdown_text = f.read()
-
-# 获取保留层级结构的文本块
-chunks = list(processor.process_markdown(markdown_text))
-```
-
-### 导出为多种格式
-```python
-from markdown_hierarchy_splitter import create_output_files
-
-# 文件会自动从 data/input 读取，并保存到 data/output
-results = create_output_files(
-    input_file="example.md",  # 只需提供文件名
-    chunk_size=300
+# 处理文件
+results = processor.create_output_files(
+    input_path="./your_file.md",
+    output_dir="./custom_output"  # 可选，如果不指定则使用default_output_dir
 )
 ```
 
-### 项目结构说明
-```
-markdown-structure-splitter/
-├── data/
-│   ├── input/    # 存放待处理的Markdown文件
-│   └── output/   # 存放处理后的输出文件
-└── src/
-    └── markdown_hierarchy_splitter/
-        ├── processor.py  # 核心处理逻辑
-        └── config.py     # 配置文件
-```
+
 
 ## 📋 环境要求
 

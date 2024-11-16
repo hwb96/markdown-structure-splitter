@@ -1,15 +1,15 @@
-from typing import List, Dict, Tuple
-import os
+from typing import List, Dict, Tuple, Optional
 from pathlib import Path
 from docx import Document
 from docx.shared import Pt
 import csv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from .config import INPUT_DIR, OUTPUT_DIR
 
 
 class MarkdownProcessorLocal:
-    def __init__(self, chunk_size: int = 300):
+    def __init__(self,
+                 chunk_size: int = 300,
+                 default_output_dir: Path | str | None = None):
         self.chunk_size = chunk_size
         self.current_headers = {1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -17,6 +17,12 @@ class MarkdownProcessorLocal:
             chunk_overlap=0,
             separators=["\n\n", "\n", "。", "；", "，", " ", ""]
         )
+
+        # 设置默认输出目录
+        if default_output_dir is None:
+            self.default_output_dir = Path.cwd() / 'output'
+        else:
+            self.default_output_dir = Path(default_output_dir)
 
     def get_header_level(self, line: str) -> int:
         if not line.strip().startswith('#'):
@@ -153,86 +159,95 @@ class MarkdownProcessorLocal:
                 for chunk in chunks:
                     yield headers + chunk + "\n"
 
+    def create_output_files(
+            self,
+            input_path: str | Path,
+            output_dir: Optional[str | Path] = None,
+            create_md: bool = True,
+            create_docx: bool = True,
+            create_csv: bool = True
+    ) -> List[str]:
+        """处理Markdown文件并保存为多种格式
 
-def create_output_files(input_file: str, chunk_size: int = 300):
-    """处理Markdown文件并保存为多种格式
+        Args:
+            input_path: 输入文件的完整路径或相对路径
+            output_dir: 输出目录的路径，如果为None则使用默认的output目录
+            create_md: 是否创建markdown输出
+            create_docx: 是否创建word文档输出
+            create_csv: 是否创建csv输出
 
-    Args:
-        input_file: 输入文件名（不是完整路径）
-        chunk_size: 分块大小
-    """
-    try:
-        # 构建完整的输入文件路径
-        input_path = INPUT_DIR / input_file
-        base_name = input_path.stem
+        Returns:
+            List[str]: 处理后的文本块列表
 
-        # 在output目录下创建子目录
-        output_subdir = OUTPUT_DIR / base_name
-        output_subdir.mkdir(exist_ok=True)
+        Raises:
+            FileNotFoundError: 当输入文件不存在时
+            ValueError: 当输入文件不是markdown文件时
+            Exception: 其他处理过程中的错误
+        """
+        try:
+            # 处理输入路径
+            input_path = Path(input_path)
+            if not input_path.exists():
+                raise FileNotFoundError(f"找不到输入文件: {input_path}")
 
-        # 定义输出文件路径
-        md_output = output_subdir / f"{base_name}.md"
-        docx_output = output_subdir / f"{base_name}.docx"
-        csv_output = output_subdir / f"{base_name}.csv"
+            if input_path.suffix.lower() not in ['.md', '.markdown']:
+                raise ValueError(f"不支持的文件格式: {input_path.suffix}")
 
-        # 读取输入文件
-        with open(input_path, 'r', encoding='utf-8') as f:
-            markdown_text = f.read()
+            # 处理输出目录
+            if output_dir is None:
+                output_dir = self.default_output_dir / input_path.stem
+            else:
+                output_dir = Path(output_dir)
 
-        # 处理文本
-        processor = MarkdownProcessorLocal(chunk_size=chunk_size)
-        results = list(processor.process_markdown(markdown_text))
+            output_dir.mkdir(parents=True, exist_ok=True)
 
-        # 定义分隔符
-        separator = "=" * 40  # 可以自定义分隔符
+            # 读取输入文件
+            with open(input_path, 'r', encoding='utf-8') as f:
+                markdown_text = f.read()
 
-        # 1. 保存 Markdown 文件
-        with open(md_output, 'w', encoding='utf-8') as f:
-            for i, chunk in enumerate(results, 1):
-                f.write(f"\n{separator}\n\n")
-                f.write(chunk)
+            # 处理文本
+            results = list(self.process_markdown(markdown_text))
 
-        # 2. 创建 Word 文档
-        doc = Document()
-        for i, chunk in enumerate(results, 1):
-            # 添加分隔符
-            separator_paragraph = doc.add_paragraph()
-            separator_paragraph.add_run('=' * 40)
+            # 定义分隔符
+            separator = "=" * 40
 
-            # 添加内容
-            content_paragraph = doc.add_paragraph()
-            content_paragraph.add_run(chunk)
+            # 1. 保存 Markdown 文件
+            if create_md:
+                md_output = output_dir / f"{input_path.stem}.md"
+                with open(md_output, 'w', encoding='utf-8') as f:
+                    for chunk in results:
+                        f.write(f"\n{separator}\n\n")
+                        f.write(chunk)
+                print(f"已生成 Markdown 文件：{md_output}")
 
-            # 设置字体
-            for run in separator_paragraph.runs + content_paragraph.runs:
-                run.font.size = Pt(11)
-                run.font.name = 'Arial'
+            # 2. 创建 Word 文档
+            if create_docx:
+                docx_output = output_dir / f"{input_path.stem}.docx"
+                doc = Document()
+                for chunk in results:
+                    separator_paragraph = doc.add_paragraph()
+                    separator_paragraph.add_run('=' * 40)
+                    content_paragraph = doc.add_paragraph()
+                    content_paragraph.add_run(chunk)
+                    for run in separator_paragraph.runs + content_paragraph.runs:
+                        run.font.size = Pt(11)
+                        run.font.name = 'Arial'
+                doc.save(docx_output)
+                print(f"已生成 Word 文件：{docx_output}")
 
-        doc.save(docx_output)
+            # 3. 保存 CSV 文件
+            if create_csv:
+                csv_output = output_dir / f"{input_path.stem}.csv"
+                with open(csv_output, 'w', encoding='utf-8', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(['Content'])
+                    for chunk in results:
+                        writer.writerow([chunk.strip()])
+                print(f"已生成 CSV 文件：{csv_output}")
 
-        # 3. 保存 CSV 文件
-        with open(csv_output, 'w', encoding='utf-8', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(['Content'])  # 写入表头
-            for chunk in results:
-                writer.writerow([chunk.strip()])
+            print(f"\n处理完成！共生成 {len(results)} 个文本块")
+            return results
 
-        print(f"处理完成！共生成 {len(results)} 个文本块")
-        print(f"输出文件已保存至 {output_subdir} 目录：")
-        print(f"- Markdown文件：{md_output}")
-        print(f"- Word文件：{docx_output}")
-        print(f"- CSV文件：{csv_output}")
-
-        return results
-
-    except FileNotFoundError:
-        print(f"错误：找不到输入文件 {input_path}")
-    except Exception as e:
-        print(f"处理过程中发生错误：{str(e)}")
-
-
-if __name__ == "__main__":
-    results = create_output_files(
-        input_file="./20241116-正文.md",
-        chunk_size=300
-    )
+        except Exception as e:
+            print(f"处理过程中发生错误：{str(e)}")
+            raise
