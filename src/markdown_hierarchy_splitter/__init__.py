@@ -1,3 +1,4 @@
 from .processor import MarkdownProcessorLocal
+from .formatter import MarkdownFormatter
 
-__all__ = ['MarkdownProcessorLocal']
+__all__ = ['MarkdownProcessorLocal', 'MarkdownFormatter']
