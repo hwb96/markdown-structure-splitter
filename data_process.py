@@ -7,5 +7,5 @@ processor = MarkdownProcessorLocal(
 
 # 处理文件
 results = processor.create_output_files(
-    input_path="20241116-正文.md",
+    input_path="xx.md",
 )

@@ -14,9 +14,9 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "python-docx>=0.8.10",
-        "langchain-text-splitters>=0.0.1",
-        "setuptools>=61.0.0"  # 添加setuptools最低版本要求
+        "python-docx",
+        "langchain",
+        "setuptools==58.2.0"
     ],
     python_requires=">=3.10",
     author="Han Wenbo",
