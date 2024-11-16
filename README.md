@@ -42,70 +42,6 @@
    - 标准化处理：一级标题自动保留，需要手动处理。只能对（1, 1.1, 1.2.2）这样类似的标题自动化转为二级标题，三级标题，四级标题
    - 文档结构处理：如果标题层级没处理好，分割后的元信息处理有缺陷。
 
-## 🚀 安装方法
-
-### 从PyPI安装（推荐）
-```bash
-pip install markdown-hierarchy-splitter
-```
-
-### 本地开发安装
-1. 克隆仓库
-```bash
-git clone https://github.com/yourusername/markdown-hierarchy-splitter.git
-cd markdown-hierarchy-splitter
-```
-
-2. 创建虚拟环境（可选但推荐）
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# 或
-.\venv\Scripts\activate  # Windows
-```
-
-3. 安装开发模式
-```bash
-pip install -e .
-```
-
-## 📚 使用方法
-
-使用详情在本项目的example中有更详细的使用说明，详情请参考[示例](./example)，说明文档[示例说明文档](./example/README.md)。
-
-
-
-
-
-## 标题格式化规则
-- 数字编号格式（如1.2.3）自动转换为对应级别标题
-- 数字+中文（如1 总则）自动转换为二级标题
-- 保持第一个非空行作为文档主标题(需要手动操作)
-- 保留纯数字行的原始格式
-
-## 📋 环境要求
-
-- Python 3.6+
-- python-docx
-- langchain-text-splitters
-
-## 🎈 使用小贴士
-
-1. **文件处理流程**：
-   - 建议先使用格式化功能规范化文档
-   - 然后再进行文档分割处理
-   - 处理后的文件会自动保存在指定目录
-
-2. **格式化建议**：
-   - 保持文档第一个标题作为主标题
-   - 检查特殊格式标题是否被正确识别
-   - 必要时可以手动调整不规则标题
-
-3. **分割参数调优**：
-   - chunk_size建议设置在300-500之间
-   - 包含大量表格时可适当增加chunk_size
-   - 先用小样本测试再处理大文件
-
 ## 📝 示例输出
 
 ### 格式化
@@ -174,6 +110,72 @@ g) 注水泥前，钻井液性能应保持稳定；降低钻井液屈服值，�
 
 ========================================
 ```
+
+## 🚀 安装方法
+
+### 从PyPI安装（推荐）
+```bash
+pip install markdown-hierarchy-splitter
+```
+
+### 本地开发安装
+1. 克隆仓库
+```bash
+git clone https://github.com/yourusername/markdown-hierarchy-splitter.git
+cd markdown-hierarchy-splitter
+```
+
+2. 创建虚拟环境（可选但推荐）
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或
+.\venv\Scripts\activate  # Windows
+```
+
+3. 安装开发模式
+```bash
+pip install -e .
+```
+
+## 📚 使用方法
+
+使用详情在本项目的example中有更详细的使用说明，详情请参考[示例](./example)，说明文档[示例说明文档](./example/README.md)。
+
+
+
+
+
+## 标题格式化规则
+- 数字编号格式（如1.2.3）自动转换为对应级别标题
+- 数字+中文（如1 总则）自动转换为二级标题
+- 保持第一个非空行作为文档主标题(需要手动操作)
+- 保留纯数字行的原始格式
+
+## 📋 环境要求
+
+- Python 3.6+
+- python-docx
+- langchain-text-splitters
+
+## 🎈 使用小贴士
+
+1. **文件处理流程**：
+   - 建议先使用格式化功能规范化文档
+   - 然后再进行文档分割处理
+   - 处理后的文件会自动保存在指定目录
+
+2. **格式化建议**：
+   - 保持文档第一个标题作为主标题
+   - 检查特殊格式标题是否被正确识别
+   - 必要时可以手动调整不规则标题
+
+3. **分割参数调优**：
+   - chunk_size建议设置在300-500之间
+   - 包含大量表格时可适当增加chunk_size
+   - 先用小样本测试再处理大文件
+
+
 
 ## 🤝 贡献指南
 
