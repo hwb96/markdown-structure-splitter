@@ -112,11 +112,6 @@ g) 注水泥前，钻井液性能应保持稳定；降低钻井液屈服值，�
 
 ## 🚀 安装方法
 
-### 从PyPI安装（推荐）
-```bash
-pip install markdown-hierarchy-splitter
-```
-
 ### 本地开发安装
 1. 克隆仓库
 ```bash
